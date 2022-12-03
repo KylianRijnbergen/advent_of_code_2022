@@ -29,22 +29,20 @@ int main(int argc, char* argv[]) {
         } 
 
         if (c == 'X' || c == 'Y' || c == 'Z' ) {
-            p1_obj = c - 88;
+            p1_obj = c - 87;
         }
 
         if (c == '\n') {            
             /* 0 points for loss, 3 for draw, 6 for win */  
             player_score += 3 * p1_obj;
-            if (p1_obj == 0) {
-                if (p0_pick == 'A') {
-                    player_score += 3;
-                }
-                if (p0_pick == 'B') {
-                    player_score += 1; 
-                }
-                if (p0_pick == 'C') {
-                    player_score += 2;
-                }
+            if (p1_obj == 0 && p0_pick == 'A') {
+                player_score += 3;
+            }
+            if (p1_obj == 0 && p0_pick == 'B') {
+                player_score += 1; 
+            }
+            if (p1_obj == 0 && p0_pick == 'C') {
+                player_score += 2;
             }
 
             if (p1_obj == 1) {
@@ -59,7 +57,7 @@ int main(int argc, char* argv[]) {
                     player_score += 3;
                 }
                 if (p0_pick == 'C') {
-                    player_score += 1;
+                    player_score += 2;
                 }
             }
         }
