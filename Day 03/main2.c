@@ -7,7 +7,7 @@ char ALPHABET[52];
 
 int main(int argc, char* argv[]) {
     FILE* file;
-    file = fopen("inputbob.txt", "r");
+    file = fopen("input.txt", "r");
     char ELVES[3][MAX_LEN];
 
     /* Fill char array ALPHABET */
