@@ -7,7 +7,7 @@ char ALPHABET[52];
 
 int main(int argc, char* argv[]) {
     FILE* file;
-    file = fopen("input.txt", "r");
+    file = fopen("inputbob.txt", "r");
     char ELVES[3][MAX_LEN];
 
     /* Fill char array ALPHABET */
@@ -16,9 +16,6 @@ int main(int argc, char* argv[]) {
     }
     for (char i = 97; i <= 122; i++) {
         ALPHABET[i-97] = i;
-    }
-    for (int i = 0; i < 52; i++) {
-        printf("ALPHABET[%d] is %c\n", i, ALPHABET[i]);
     }
 
     char* common_char;
@@ -49,4 +46,4 @@ char* find_common_char(char* elf1, char* elf2, char* elf3) {
             return &ALPHABET[i];
         }
     }
-}
+} 
