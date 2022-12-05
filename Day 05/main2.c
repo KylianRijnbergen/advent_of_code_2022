@@ -107,4 +107,5 @@ void move(CharStack* stack[9], int operation[3]) {
         c = pop(burner_stack);
         push(stack[to], c);
     }
+    free(burner_stack);
 }
