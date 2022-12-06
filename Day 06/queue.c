@@ -58,16 +58,16 @@ void print_cqueue(CharQueue* cqueue) {
 
 bool has_dupes(CharQueue* cqueue) {
     CharNode* curr_node = cqueue->head;
-    bool seen[26];
-    for (int i = 0; i < 26; i++) {
+    bool seen[256];
+    for (int i = 0; i < 256; i++) {
         seen[i] = false;
     }
 
     for (int i = 0; i < cqueue->count; i++) {
-        if (seen[curr_node->value - 97]) {
+        if (seen[curr_node->value]) {
             return true;
         }
-        seen[curr_node->value - 97] = true;
+        seen[curr_node->value] = true;
         if (curr_node->next != NULL) {
             curr_node = curr_node->next;
         }

@@ -3,7 +3,7 @@
 #include "queue.h"
 
 int main(int argc, char* argv[]) {
-    int maxsize = 14;
+    int maxsize = 4;
     CharQueue* queue = cqueue(maxsize);
 
     FILE* file;
