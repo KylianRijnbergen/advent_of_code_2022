@@ -7,7 +7,7 @@ typedef struct CharQueue {
 } CharQueue;
 
 CharQueue* cqueue(void);
-char eject(CharQueue* cstack);
+char eject(CharQueue* cqueue);
 void push(CharQueue* cqueue, char c);
 void print_cqueue(CharQueue* cqueue);
 #endif
