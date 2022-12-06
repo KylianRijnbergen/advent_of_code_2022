@@ -1,13 +1,22 @@
 #ifndef MY_QUEUE_H
 #define MY_QUEUE_H
-#define MAX_QUEUE_SIZE 4
+#include <stdbool.h>
+
+typedef struct CharNode {
+    char value;
+    struct CharNode* next;
+} CharNode;
+
 typedef struct CharQueue {
     int count;
-    char queue[MAX_QUEUE_SIZE];
+    int maxsize;
+    CharNode* head;
+    CharNode* tail;
 } CharQueue;
 
-CharQueue* cqueue(void);
+CharQueue* cqueue(int maxsize);
 char eject(CharQueue* cqueue);
 void push(CharQueue* cqueue, char c);
 void print_cqueue(CharQueue* cqueue);
+bool has_dupes(CharQueue* cqueue);
 #endif
