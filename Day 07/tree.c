@@ -42,3 +42,16 @@ void assign_to_parent(Node* parent, Node* child) {
     parent->children[parent->num_children - 1] = child;
     child->parent_node = parent;
 }
+
+Node* build_tree_from_file(FILE* file) {
+    char line[50];
+    Node* tree = NULL;
+    while (fgets(line, 50, file) != NULL) {
+        int x;
+    }
+}
+
+Node* create_root_node(void) {
+    Node* root = new_node(0, "/");
+    return root;
+}
