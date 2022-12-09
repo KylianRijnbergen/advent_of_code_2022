@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define HASHMAP_X 100
-#define HASHMAP_Y 100
+#define HASHMAP_X 50
+#define HASHMAP_Y 50
 
 #define MAX_LINE_LENGTH 10
 #define KNOTS 10
