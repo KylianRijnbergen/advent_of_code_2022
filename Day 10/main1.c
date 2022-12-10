@@ -82,7 +82,6 @@ void update_registers(Cpu* cpu) {
 	if (cpu->clock % 40 == 20) {
 		save_register(cpu);
 	}
-	printf("Cpu clock is %d. Value is %d\n", cpu->clock, cpu->reg);
 }
 
 void parse_line(Cpu* cpu, char* line) {
