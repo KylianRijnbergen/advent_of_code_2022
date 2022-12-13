@@ -38,6 +38,7 @@ void queue_push(Queue* queue, Node* node);
 Node* queue_eject(Queue* queue);
 void queue_print(Queue* queue);
 bool b_is_neighbour_of_a(Node* a, Node* b);
+void generate_neighbours(Node** grid);
 
 int main(int argc, char* argv[]) {
     /* Init grid */
@@ -73,51 +74,14 @@ int main(int argc, char* argv[]) {
     /* Find start and end nodes */
     Node* start_node = get_start_node(grid);
     Node* end_node = get_end_node(grid);
+    printf("Start node is : \n");
     node_print(start_node);
+    printf("End node is : \n");
     node_print(end_node);
 
-    Queue* queue = queue_init();
-    queue_push(queue, start_node);
-    queue_push(queue, start_node);
-    queue_push(queue, start_node);
-    queue_push(queue, start_node);
-    queue_print(queue);
 
     /* Construct Graph by assigning all neighbouring nodes to each other. */
-    for (unsigned int rowindex = 0; rowindex < ROWS; rowindex++) {
-        for (unsigned int colindex = 0; colindex < ROW_LENGTH; colindex++) {
-            Node* current_node = grid[rowindex * ROW_LENGTH + colindex];
-            Node* candidate_neighbour = NULL;
-            if (rowindex >= 1) {
-                candidate_neighbour = grid[(rowindex - 1) * ROW_LENGTH + colindex];
-                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
-                    queue_push(current_node->valid_neighbours, candidate_neighbour);
-                }
-            }
-            if (rowindex < ROWS - 1) {
-                candidate_neighbour = grid[(rowindex + 1) * ROW_LENGTH + colindex];
-                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
-                    queue_push(current_node->valid_neighbours, candidate_neighbour);
-                }
-            }
-
-            if (colindex >= 1) {
-                candidate_neighbour = grid[rowindex * ROW_LENGTH + colindex - 1];
-                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
-                    queue_push(current_node->valid_neighbours, candidate_neighbour);
-                }
-            }
-            if (colindex < ROW_LENGTH - 1) {
-                candidate_neighbour = grid[rowindex * ROW_LENGTH + colindex + 1];
-                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
-                    queue_push(current_node->valid_neighbours, candidate_neighbour);
-                }
-            }
-        }
-    }
-
-    printf("Printing valid neighbours: \n");
-    queue_print(end_node->valid_neighbours);
+    generate_neighbours(grid);
     return 0;
 }
 
@@ -218,4 +182,39 @@ bool b_is_neighbour_of_a(Node* a, Node* b) {
     bool start_and_a = (a->value == 'S' && b->value == 'a') || (a->value == 'a' && b->value == 'S');
     bool end_and_z = (a->value == 'E' && b->value == 'z') || (a->value == 'z' && b->value == 'E');
     return neighbouring_chars  || start_and_a || end_and_z; 
+}
+
+/* Construct Graph by assigning all neighbouring nodes to each other. */
+void generate_neighbours(Node** grid) {
+    for (unsigned int rowindex = 0; rowindex < ROWS; rowindex++) {
+        for (unsigned int colindex = 0; colindex < ROW_LENGTH; colindex++) {
+            Node* current_node = grid[rowindex * ROW_LENGTH + colindex];
+            Node* candidate_neighbour = NULL;
+            if (rowindex >= 1) {
+                candidate_neighbour = grid[(rowindex - 1) * ROW_LENGTH + colindex];
+                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
+                    queue_push(current_node->valid_neighbours, candidate_neighbour);
+                }
+            }
+            if (rowindex < ROWS - 1) {
+                candidate_neighbour = grid[(rowindex + 1) * ROW_LENGTH + colindex];
+                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
+                    queue_push(current_node->valid_neighbours, candidate_neighbour);
+                }
+            }
+
+            if (colindex >= 1) {
+                candidate_neighbour = grid[rowindex * ROW_LENGTH + colindex - 1];
+                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
+                    queue_push(current_node->valid_neighbours, candidate_neighbour);
+                }
+            }
+            if (colindex < ROW_LENGTH - 1) {
+                candidate_neighbour = grid[rowindex * ROW_LENGTH + colindex + 1];
+                if (b_is_neighbour_of_a(current_node, candidate_neighbour)) {
+                    queue_push(current_node->valid_neighbours, candidate_neighbour);
+                }
+            }
+        }
+    }
 }
