@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#define ROW_LENGTH 8
-#define ROWS 5
+#define ROW_LENGTH  162
+#define ROWS 41
 
 typedef struct Node Node;
 typedef struct Queue Queue;
@@ -35,28 +35,30 @@ Node* get_start_node(Node** grid);
 Node* get_end_node(Node** grid);
 Queue* queue_init(void);
 void queue_push(Queue* queue, Node* node);
+Queue* queue_concat(Queue* head_queue, Queue* tail_queue);
 Node* queue_eject(Queue* queue);
 void queue_print(Queue* queue);
 bool b_is_neighbour_of_a(Node* a, Node* b);
 void generate_neighbours(Node** grid);
+unsigned int BFS(Node* start_node, Node* end_node);
 
-int main(int argc, char* argv[]) {
+int main(void) {
     /* Init grid */
     const unsigned int NUM_NODES = ROWS * ROW_LENGTH;
-    Node** grid = malloc(sizeof(Node*) * NUM_NODES);
+    Node** grid = (Node**)malloc(sizeof(Node*) * NUM_NODES);
     for (unsigned int node = 0; node < NUM_NODES; node++) {
         grid[node] = NULL;
     }
 
     /* Initialize all nodes in grid */
-    FILE* file = fopen("test.txt", "r");
+    FILE* file = fopen("input.txt", "r");
     char c;
     unsigned int current_character = 0;
     while((c = fgetc(file)) != EOF) {
         if (c == '\n') {
             continue;
         }
-        Node* node = malloc(sizeof(Node));
+        Node* node = (Node*)malloc(sizeof(Node));
         int xloc;
         int yloc;
         index_to_coord(current_character, &xloc, &yloc);
@@ -74,14 +76,14 @@ int main(int argc, char* argv[]) {
     /* Find start and end nodes */
     Node* start_node = get_start_node(grid);
     Node* end_node = get_end_node(grid);
-    printf("Start node is : \n");
     node_print(start_node);
-    printf("End node is : \n");
     node_print(end_node);
-
-
     /* Construct Graph by assigning all neighbouring nodes to each other. */
     generate_neighbours(grid);
+    unsigned int final_depth = BFS(start_node, end_node);
+
+    printf("Fewest required steps is %d\n", final_depth);
+
     return 0;
 }
 
@@ -100,11 +102,10 @@ void grid_print(Node** grid) {
 }
 
 void node_print(Node* node) {
-    printf("X: %d, Y: %d, Value: %c\n", node->x, node->y, node->value);
+    printf("X: %d, Y: %d, Value: %c, Depth: %d\n", node->x, node->y, node->value, node->depth);
 }
 
 Node* get_start_node(Node** grid) {
-    Node* start_node = NULL;
     for (unsigned int i = 0; i < ROWS; i++) {
         for (unsigned int j = 0; j < ROW_LENGTH; j++) {
             if (grid[i * ROW_LENGTH + j]->value == 'S') {
@@ -113,10 +114,10 @@ Node* get_start_node(Node** grid) {
         }
     }
     printf("Start node not found!\n");
+    exit(1);
 }
 
 Node* get_end_node(Node** grid) {
-    Node* end_node = NULL;
     for (unsigned int i = 0; i < ROWS; i++) {
         for (unsigned int j = 0; j < ROW_LENGTH; j++) {
             if (grid[i * ROW_LENGTH + j]->value == 'E') {
@@ -125,10 +126,11 @@ Node* get_end_node(Node** grid) {
         }
     }
     printf("End node not found!\n");
+    exit(1);
 }
 
 Queue* queue_init(void) {
-    Queue* queue = malloc(sizeof(Queue));
+    Queue* queue = (Queue*)malloc(sizeof(Queue));
     queue->size = 0;
     queue->head = NULL;
     queue->tail = NULL;
@@ -137,7 +139,7 @@ Queue* queue_init(void) {
 
 void queue_push(Queue* queue, Node* node) {
     /* Create node */
-    Qnode* queue_node = malloc(sizeof(Qnode));
+    Qnode* queue_node = (Qnode*)malloc(sizeof(Qnode));
     queue_node->node = node;
     queue_node->next = NULL;
 
@@ -152,6 +154,30 @@ void queue_push(Queue* queue, Node* node) {
         queue->head = queue_node;
     }
     queue->size++;
+}
+
+Queue* queue_concat(Queue* head_queue, Queue* tail_queue) {
+    /* If head queue is empty, return tail queue */
+    if (head_queue->head == NULL) {
+        head_queue->head = tail_queue->head;
+        head_queue->tail = tail_queue->tail;
+        free(tail_queue);
+        return head_queue;
+    }
+    /* If tail queue is empty, return head queue */
+    if (tail_queue->head == NULL) {
+        return head_queue;
+    }
+
+    /* If head neither head_queue nor tail_queue are empty, we need to connect the queues. 
+    To do this, we need to let the tail of the head queue point to the head of the tail queue. 
+    Also, we need to adjust the size of the queue. 
+    Lastly, we need to free the tail_queue. */
+
+    head_queue->tail->next = tail_queue->head;
+    head_queue->size += tail_queue->size;
+    free(tail_queue);
+    return head_queue;
 }
 
 Node* queue_eject(Queue* queue) {
@@ -178,10 +204,10 @@ void queue_print(Queue* queue) {
 }
 
 bool b_is_neighbour_of_a(Node* a, Node* b) {
-    bool neighbouring_chars = (b->value - a->value) <= 1;
+    bool neighbouring_chars = ((b->value - a->value) <= 1 && (!(b->value == 'E')));
     bool start_and_a = (a->value == 'S' && b->value == 'a') || (a->value == 'a' && b->value == 'S');
     bool end_and_z = (a->value == 'E' && b->value == 'z') || (a->value == 'z' && b->value == 'E');
-    return neighbouring_chars  || start_and_a || end_and_z; 
+    return neighbouring_chars || start_and_a || end_and_z; 
 }
 
 /* Construct Graph by assigning all neighbouring nodes to each other. */
@@ -217,4 +243,42 @@ void generate_neighbours(Node** grid) {
             }
         }
     }
+}
+
+unsigned int BFS(Node* start_node, Node* end_node) {
+    start_node->visited = true;
+    Queue* priority_queue_current = queue_init(); /* Create empty queue */
+    Queue* priority_queue_next = queue_init();
+    Node* current_node = start_node;
+    /* Keep track of which node is the start node */
+    unsigned int current_depth = 0; /* Set initial depth to 1, such that we can update the depth of all nodes */
+    
+    /* We keep iterating over our nodes until we reach our destination */
+    while (current_node != end_node) {
+        /* Set depth of current node */
+        /* Then, we add all unvisited nodes to the back of our priority queue, */
+        Qnode* tmp_qnode = current_node->valid_neighbours->head;
+        while (tmp_qnode != NULL) {
+            Node* tmp_node = tmp_qnode->node;
+            if (tmp_node->visited == false && b_is_neighbour_of_a(current_node, tmp_node)) {
+                tmp_node->visited = true;
+                tmp_node->depth = current_node->depth + 1;
+                queue_push(priority_queue_next, tmp_node);;
+            }
+            tmp_qnode = tmp_qnode->next;
+        }
+
+        /* If there are nodes left, we want to make the next node in our queue the current node */
+        if (priority_queue_current->size == 0) {
+            /* If there are no nodes left of the current level, we increase depth. */
+            current_depth++;
+            Queue* tmp = priority_queue_current;
+            priority_queue_current = priority_queue_next;
+            priority_queue_next = tmp;
+        }
+        current_node = queue_eject(priority_queue_current);
+    }
+    /* We now have our end node. We need to add 1 to get the correct depth. */
+    /* Once we have reached our destination, we wish to return depth. */
+    return end_node->depth;
 }
